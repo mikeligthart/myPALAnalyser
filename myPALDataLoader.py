@@ -1,7 +1,7 @@
 import json
 from pprint import pprint
 from operator import itemgetter
-import datetime
+from datetime import datetime
 
 class MyPALDataLoader:
 
@@ -25,7 +25,12 @@ class MyPALDataLoader:
         for index in range(0, len(rawActivities)):
             activities.append({})
             activities[index]['participant'] = self._changeNameForNumber(rawActivities[index]['userName'])
-            activities[index]['added'] = datetime.datetime.fromtimestamp(rawActivities[index]['added']/1000.0)
+            activities[index]['added'] = datetime.fromtimestamp(rawActivities[index]['added']/1000.0)
+            activities[index]['start'] = datetime.strptime(rawActivities[index]['date'] + ' ' + rawActivities[index]['starttime'], '%Y-%m-%d %H:%M:%S')
+            activities[index]['end'] = datetime.strptime(rawActivities[index]['date'] + ' ' + rawActivities[index]['endtime'], '%Y-%m-%d %H:%M:%S')
+            activities[index]['name'] = rawActivities[index]['name']
+            activities[index]['description'] = rawActivities[index]['description']
+            activities[index]['emotion'] = rawActivities[index]['emotion']
             try:
                 activities[index]['picture'] = rawActivities[index]['picture']['name']
             except TypeError:
