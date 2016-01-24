@@ -2,6 +2,7 @@ import csv
 import os
 from datetime import datetime
 from operator import itemgetter
+import re
 
 activitiesCSV = 'data/raw/activities.csv'
 activityTypeCSV = 'data/raw/activity_types.csv'
@@ -44,8 +45,8 @@ def findPicture(pictures, picture_id):
 def findActivityType(activity_types, activity_type_id):
     for activity_type in activity_types:
         if activity_type['ID'] == activity_type_id:
-            return picture['NAME']
-        return None
+            return activity_type['NAME'].lower()
+    return None
 
 # Process pictures
 for index in range(0, len(pictures)):
@@ -71,9 +72,11 @@ for rawActivity in rawActivities:
     activity['end'] = datetime.strptime(rawActivity['DATE'] + ' ' + rawActivity['STARTTIME'], '%Y-%m-%d %H:%M:%S')
     activity['type'] = findActivityType(activityTypes, rawActivity['TYPE_ID'])
     activity['name'] = rawActivity['NAME']
-    activity['description'] = str(activity['participant']) + '_' + rawActivity['DESCRIPTION']
+    activity['description'] = rawActivity['DESCRIPTION']
     activity['emotion'] = rawActivity['EMOTION']
     activity['picture'] = findPicture(pictures, rawActivity['PICTURE_ID'])
+    activity['carbohydrate_value'] = rawActivity['CARBOHYDRATE_VALUE']
+    activity['#words'] = len(re.findall(r'\w+', rawActivity['DESCRIPTION']))
     activities.append(activity)
     activities = sorted(activities, key=itemgetter('added'))
 
