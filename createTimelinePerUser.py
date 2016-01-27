@@ -16,7 +16,7 @@ def get_timeline_filepath(feature_name):
 participants = []
 user_logs = []
 
-date_range = range(0, 20)
+date_range = range(0, 23)
 time_x_axis = []
 data_y_axis = []
 
@@ -58,6 +58,7 @@ for feature_name_index in range(0, len(feature_names)):
                 data_y_axis[participant_index][date_index][feature_index] += 1
     np.save(get_timeline_filepath(feature_names[feature_name_index]), data_y_axis)
 
+"""
     # Build plots
     data = []
     plot_url = []
@@ -72,3 +73,4 @@ for feature_name_index in range(0, len(feature_names)):
                 ))
         filename = feature_names[feature_name_index] + '_p' + str(participant_index)
         plot_url.append(py.plot(go.Figure(data=data[participant_index], layout=layout), filename=filename, auto_open=False))
+"""
