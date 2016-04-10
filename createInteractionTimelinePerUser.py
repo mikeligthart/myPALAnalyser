@@ -1,9 +1,6 @@
 import csv
 from datetime import datetime, timedelta
-import plotly.plotly as py
-import plotly.graph_objs as go
 import numpy as np
-import matplotlib.pyplot as plt
 
 # File paths
 participants_CSV = 'data/cleaned/participants.csv'
@@ -21,7 +18,10 @@ time_x_axis = []
 data_y_axis = []
 
 feature_names = ['activity_timeline', 'measurement_timeline', 'picture_timeline', 'goal_timeline']
-features = [['LOGIN', 'TOGETHERORSELF', 'TOGETHER','ADDEDACTIVITY', 'VIEWACTIVITY', 'UPDATEACTIVITY', 'DELETEACTIVITY', 'ADDEDACTIVITYTYPE', 'DELETEACTIVITYTYPE', 'LOGOFF'], ['LOGIN', 'ADDEDGLUCOSE', 'ADDEDINSULIN', 'VIEWMEASUREMENT', 'REMOVEDMEASUREMENT', 'UPDATEGLUCOSE', 'UPDATEINSULIN', 'DELETEGLUCOSE', 'DELETEINSULIN', 'LOGOFF'], ['LOGIN', 'ACCESSGALLERY', 'ACCESSADDPICTUREPAGE', 'ACCESSADDPICTUREDIRECTLYPAGE','SELECTPICTUREFROMGALLRERYPAGE', 'ADDEDPICTUREDIRECTLY' 'ADDEDPICTURE', 'UPLOADEDPICTURE', 'LINKPICTURETOACTIVITY', 'DELETEPICTUREFROMACTIVITY', 'UNLINKPICTUREFROMACTIVITY', 'DELETEPICTUREFROMGALLERY', 'LOGOFF'], ['LOGIN', 'ACCESSGOALS','ACCESSGOALADDDAILYPAGE', 'ADDEDGOALDAILY', 'ACCESSGOALADDTOTALPAGE','ADDEDGOALTOTAL', 'DELETEGOAL', 'LOGOFF']]
+features = [['LOGIN', 'TOGETHERORSELF', 'TOGETHER','ADDEDACTIVITY', 'VIEWACTIVITY', 'UPDATEACTIVITY', 'DELETEACTIVITY', 'ADDEDACTIVITYTYPE', 'DELETEACTIVITYTYPE', 'LOGOFF'],
+            ['LOGIN', 'ADDEDGLUCOSE', 'ADDEDINSULIN', 'VIEWMEASUREMENT', 'REMOVEDMEASUREMENT', 'UPDATEGLUCOSE', 'UPDATEINSULIN', 'DELETEGLUCOSE', 'DELETEINSULIN', 'LOGOFF'],
+            ['LOGIN', 'ACCESSGALLERY', 'ACCESSADDPICTUREPAGE', 'ACCESSADDPICTUREDIRECTLYPAGE','SELECTPICTUREFROMGALLRERYPAGE', 'ADDEDPICTUREDIRECTLY' 'ADDEDPICTURE', 'UPLOADEDPICTURE', 'LINKPICTURETOACTIVITY', 'DELETEPICTUREFROMACTIVITY', 'UNLINKPICTUREFROMACTIVITY', 'DELETEPICTUREFROMGALLERY', 'LOGOFF'],
+            ['LOGIN', 'ACCESSGOALS','ACCESSGOALADDDAILYPAGE', 'ADDEDGOALDAILY', 'ACCESSGOALADDTOTALPAGE','ADDEDGOALTOTAL', 'DELETEGOAL', 'LOGOFF']]
 
 # Load CSV files
 with open(participants_CSV, 'rb') as csv_file:
@@ -43,6 +43,7 @@ def get_date_index(x_axis, date_string):
     date = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S').date()
     return x_axis.index(date)
 
+# Main function
 for feature_name_index in range(0, len(feature_names)):    
     # Prepare axis
     for participant in participants:
@@ -58,19 +59,3 @@ for feature_name_index in range(0, len(feature_names)):
                 data_y_axis[participant_index][date_index][feature_index] += 1
     np.save(get_timeline_filepath(feature_names[feature_name_index]), data_y_axis)
 
-"""
-    # Build plots
-    data = []
-    plot_url = []
-    layout = go.Layout(barmode='stack')
-    for participant_index in range(0, len(data_y_axis)):
-        data.append([])
-        for feature_index in range(0, len(features)):
-            data[participant_index].append(go.Bar(
-                x=time_x_axis[participant_index],
-                y=data_y_axis[participant_index, :, feature_index],
-                name=features[feature_name_index][feature_index]
-                ))
-        filename = feature_names[feature_name_index] + '_p' + str(participant_index)
-        plot_url.append(py.plot(go.Figure(data=data[participant_index], layout=layout), filename=filename, auto_open=False))
-"""

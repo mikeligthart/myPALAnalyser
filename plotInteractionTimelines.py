@@ -4,6 +4,11 @@ from matplotlib.font_manager import FontProperties
 import csv
 from datetime import datetime, timedelta
 
+
+# Settings
+debug = False # in debug mode only the plot of only the first participants is created
+save_as = "both" #can be saved as png, svg or both
+
 # Load participant CSV
 participants_CSV = 'data/cleaned/participants.csv'
 with open(participants_CSV, 'rb') as csv_file:
@@ -18,28 +23,16 @@ goal_timeline = np.load('data/cleaned/goal_timeline.npy')
 
 # Set features
 features = [['LOGIN', 'TOGETHERORSELF', 'TOGETHER','ADDEDACTIVITY', 'VIEWACTIVITY', 'LOGOFF'],
-            ['LOGIN', 'ADDEDGLUCOSE', 'ADDEDINSULIN', 'VIEWMEASUREMENT', 'UPDATEGLUCOSE', 'UPDATEINSULIN', 'DELETEGLUCOSE', 'DELETEINSULIN', 'LOGOFF'],
-            ['LOGIN', 'ACCESSGALLERY', 'ADDEDPICTURE', 'SELECTPICTUREFROMGALLRERYPAGE', 'ADDEDPICTUREDIRECTLY', 'LINKPICTURETOACTIVITY', 'DELETEPICTUREFROMACTIVITY', 'UNLINKPICTUREFROMACTIVITY', 'DELETEPICTUREFROMGALLERY', 'LOGOFF'],
-            ['LOGIN', 'ACCESSGOALS','ADDEDGOALDAILY', 'ADDEDGOALTOTAL', 'DELETEGOAL', 'LOGOFF']]
+            ['LOGIN', 'ADDEDGLUCOSE', 'ADDEDINSULIN', 'VIEWMEASUREMENT', 'LOGOFF'],
+            ['LOGIN', 'ACCESSGALLERY', 'ADDEDPICTURE', 'ADDEDPICTUREDIRECTLY', 'LINKPICTURETOACTIVITY','LOGOFF'],
+            ['LOGIN', 'ACCESSGOALS','ADDEDGOALDAILY', 'ADDEDGOALTOTAL', 'LOGOFF']]
 
-colors = [["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059", "#FFDBE5", "#7A4900"],
-          ["#000000", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87", "#5A0007", "#7A4900"],
-          ["#000000", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80", "#61615A", "#7A4900"],
-          ["#000000","#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#7A4900"]]
-    
- 
-"""
-["#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
-"#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
-"#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
-"#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
-"#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C",
-"#34362D", "#B4A8BD", "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
-"#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00",
-"#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
-"#549E79", "#FFF69F", "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
-"#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C"]
-"""
+colors = [["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#7A4900"],
+          ["#000000", "#0000A6", "#63FFAC", "#B79762", "#7A4900"],
+          ["#000000", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#7A4900"],
+          ["#000000","#BA0900", "#6B7900", "#00C2A0", "#7A4900"]]
+
+#Red and blue line to indicate the evaluation session and the half way point    
 stop_data=[21, 20, 14, 19, 20, 19, 24, 19, 20, 14, 20, 16, 21, 20]
 half_way=[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9]
 
@@ -53,16 +46,24 @@ bar_width = 0.35
 font_prop = FontProperties()
 font_prop.set_size('small')
 
-for participant_index in range(0, len(participants)):
+numberOfParticipants = len(participants)
+if (debug):
+    numberOfParticipants = 1
+
+for participant_index in range(0, numberOfParticipants):
+    #General plot features
     f, (ax0, ax1, ax2, ax3) = plt.subplots(4, sharex=True)
     x = get_list_of_dates(participants[participant_index]['start_date'])
     temp_x = [i for i in range(0, len(x))]
     tick_pos = [i+(bar_width/2) for i in range(0, len(x))]
     ticks = [datetime.strftime(date, '%d %b') for date in x]
-    plt.xticks(tick_pos[0::2], ticks[0::2], size=11)
+    plt.xticks(tick_pos[0::2], ticks[0::2], size=9)
     txt = f.text(-0.01, 0.5, '# behaviors', va='center', rotation='vertical')
-    plot_title = 'Interaction profile participant ' + str(participant_index+1)
+    plot_title = 'Interaction timeline participant ' + str(participant_index+1)
     ttl = f.text(0.5, 1.01, plot_title, ha='center', size=16)
+    dpifig = 300
+    if debug:
+        dpifig = 72
     
     #Activity features
     for feature_index in range(0, len(features[0])):
@@ -73,7 +74,7 @@ for participant_index in range(0, len(participants)):
     ax0.set_title('Activities')
     ax0.axvline(stop_data[participant_index], color='r')
     ax0.axvline(half_way[participant_index], color='b')
-    lgd0 = ax0.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.3, 1.1), title='Activities')
+    lgd0 = ax0.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.31, 1.1), title='Activities')
 
 
     #Measurement features
@@ -85,7 +86,7 @@ for participant_index in range(0, len(participants)):
     ax1.set_title('Measurements')
     ax1.axvline(stop_data[participant_index], color='r')
     ax1.axvline(half_way[participant_index], color='b')
-    lgd1 = ax1.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.6, 2.6), title='Measurements')
+    lgd1 = ax1.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.65, 2.95), title='Measurements')
 
     #Picture features
     for feature_index in range(0, len(features[2])):
@@ -96,7 +97,7 @@ for participant_index in range(0, len(participants)):
     ax2.set_title('Pictures')
     ax2.axvline(stop_data[participant_index], color='r')
     ax2.axvline(half_way[participant_index], color='b')
-    lgd2 = ax2.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.45, 1.2), title='Pictures')
+    lgd2 = ax2.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.385, 1.2), title='Pictures')
 
     #Goal features
     for feature_index in range(0, len(features[3])):
@@ -108,8 +109,13 @@ for participant_index in range(0, len(participants)):
     ax3.set_xlabel("Date")
     ax3.axvline(stop_data[participant_index], color='r')
     ax3.axvline(half_way[participant_index], color='b')
-    lgd3 = ax3.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.725, 2.5), title='Goals')
+    lgd3 = ax3.legend(prop = font_prop, loc='upper right', bbox_to_anchor=(1.7, 3.05), title='Goals')
 
     f.tight_layout()
-    plt.savefig('data/cleaned/plots/timeline_p' + str(participant_index + 1) + '.png', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight')
+    
+    if save_as == "png" or save_as == "both":
+
+        plt.savefig('data/cleaned/timelines/interaction/timeline_p' + str(participant_index + 1) + '.png', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', dpi=dpifig)
+    if save_as == "svg" or save_as == "both":
+        plt.savefig('data/cleaned/timelines/interaction/timeline_p' + str(participant_index + 1) + '.svg', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', format='svg')
     plt.close(f)

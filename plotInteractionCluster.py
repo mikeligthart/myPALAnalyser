@@ -1,23 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
-data = np.array([
-    [3,2],
-    [8,8],
-    [13,3],
-    [15,8],
-    [13,2],
-    [3,3],
-    [0,0],
-    [1,1],
-    [6,6],
-    [11,15],
-    [14,13],
-    [13, 5],
-    [7, 3],
-    [14,12]])
 
+addedContent = np.load('data/cleaned/timeline_analysis_added_content.npy')
+consistency = np.load('data/cleaned/timeline_analysis_consistency.npy')
+nr_of_participants = len(addedContent)
+ 
 colors = ["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
 "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
@@ -34,11 +22,23 @@ colors = ["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#00
 area=np.ones([1, 14])*150
 area[0,6]=5
 
+added_content_norm = np.linalg.norm(addedContent)
+consistency_norm = np.linalg.norm(consistency)/2
+consistency_x_shift = 0.1
 
-for index in range(0,14):
+for index in range(0,nr_of_participants):
     label = 'p' + str(index+1)
-    plt.scatter(data[index,0], data[index,1], s=area[0,index], c=colors[index], alpha=0.5, label=label)
-    
-plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.0))
+    scatter_plot = plt.scatter(consistency_x_shift + (np.max(consistency) - consistency[index])/consistency_norm, addedContent[index], s=area[0,index], c=colors[index], alpha=0.5, label=label)
+
+plt.ylim([0,80])
+plt.xlim([0, 1])
+lgd = plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.08))
+title = plt.title('Interaction Timeline Summary: Consistency vs. # Added Content', y=1.08)
+#plt.text(0.5, 1.01, 'Interaction Timeline Summary: Consistency vs. Added Content', ha='center', size=16)
+x_label = plt.xlabel('Consistency')
+y_label = plt.ylabel('# Added Content')
+#plt.text(-0.01, 0.5, 'Added Content', va='center', rotation='vertical')
+
 plt.grid()
-plt.show()
+plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
+
