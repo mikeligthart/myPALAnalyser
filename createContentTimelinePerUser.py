@@ -9,6 +9,7 @@ import numpy as np
 import csv
 from datetime import datetime, timedelta
 from operator import itemgetter
+import re
 
 #Parameters
 nr_of_days = 24
@@ -24,6 +25,11 @@ user_logs_CSV = 'data/cleaned/user_logs.csv'
 with open(user_logs_CSV, 'rb') as csv_file:
     reader = csv.DictReader(csv_file)
     user_logs = list(reader)
+    
+activities_CSV = 'data/cleaned/activities.csv'
+with open(activities_CSV, 'rb') as csv_file:
+    reader = csv.DictReader(csv_file)
+    activities = list(reader)
 
 #Helper functions
 def get_list_of_dates(start_date_string):
@@ -56,16 +62,34 @@ def get_login_time(logs):
             return get_cummalative_login_time(sorted_logs, 0)
     else:
         return 0
+
+def get_average_nr_of_words(activities):
+    if(len(activities) > 0):
+        nr_of_words = []
+        for act in activities:
+            nr_of_words.append(len(re.findall(r'\w+', act['description'])))
+        return np.average(nr_of_words)
+    else:
+        return 0
+        
     
 for log in user_logs:
-    log['timestamp'] = datetime.strptime(log['timestamp'], '%Y-%m-%d %H:%M:%S')    
+    log['timestamp'] = datetime.strptime(log['timestamp'], '%Y-%m-%d %H:%M:%S')
 
-login_time = np.zeros([len(participants), nr_of_days])  
+for act in activities:
+    act['added'] = datetime.strptime(act['added'], '%Y-%m-%d %H:%M:%S')
+
+login_time = np.zeros([len(participants), nr_of_days])
+nr_of_words = np.zeros([len(participants), nr_of_days]) 
 for participant_index in range(0, len(participants)):
     logs_for_participant = filter(lambda log: log['participant'] == participants[participant_index]['participant'], user_logs)
+    activities_for_participant = filter(lambda act: act['participant'] == participants[participant_index]['participant'], activities)
     dates = get_list_of_dates(participants[participant_index]['start_date'])
     for date_index in range(0, nr_of_days):
         logs_for_participant_for_date = filter(lambda log: log['timestamp'].date() == dates[date_index], logs_for_participant)
+        activities_for_participant_for_date = filter(lambda log: log['added'].date() == dates[date_index], activities_for_participant)
         login_time[participant_index][date_index] = get_login_time(logs_for_participant_for_date)
+        nr_of_words[participant_index][date_index] = get_average_nr_of_words(activities_for_participant_for_date)
         
 np.save('data/cleaned/login_time.npy', login_time)
+np.save('data/cleaned/average_nr_of_words.npy', nr_of_words)

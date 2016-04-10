@@ -115,7 +115,7 @@ for participant_index in range(0, numberOfParticipants):
     
     if save_as == "png" or save_as == "both":
 
-        plt.savefig('data/cleaned/timelines/interaction/timeline_p' + str(participant_index + 1) + '.png', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', dpi=dpifig)
+        plt.savefig('data/cleaned/timelines/interaction/interaction_timeline_p' + str(participant_index + 1) + '.png', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', dpi=dpifig)
     if save_as == "svg" or save_as == "both":
-        plt.savefig('data/cleaned/timelines/interaction/timeline_p' + str(participant_index + 1) + '.svg', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', format='svg')
+        plt.savefig('data/cleaned/timelines/interaction/interaction_timeline_p' + str(participant_index + 1) + '.svg', bbox_extra_artists=(lgd0, lgd1, lgd2, lgd3, txt, ttl, ), bbox_inches='tight', format='svg')
     plt.close(f)
