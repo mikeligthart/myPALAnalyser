@@ -41,4 +41,4 @@ y_label = plt.ylabel('# Added Content')
 
 plt.grid()
 plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
-
+plt.close()

@@ -8,13 +8,17 @@ activitiesCSV = 'data/raw/activities.csv'
 activityTypeCSV = 'data/raw/activity_types.csv'
 picturesCSV = 'data/raw/pictures.csv'
 pictureFolder = 'data/raw/pictures/'
+goalsCSV = 'data/raw/goals.csv'
+personalLevelCSV='data/cleaned/personal_level.csv'
 
 #Load base CSV files
-
 rawActivities = []
 activities = []
 activityTypes = []
+personal_level = []
 pictures = []
+rawGoals = []
+goals = []
 
 with open(activitiesCSV, 'rb') as csvFile:
     reader = csv.DictReader(csvFile)
@@ -24,9 +28,17 @@ with open(activityTypeCSV, 'rb') as csvFile:
     reader = csv.DictReader(csvFile)
     activityTypes = list(reader)
 
+with open(personalLevelCSV, 'rb') as csvFile:
+    reader = csv.DictReader(csvFile)
+    personal_level = list(reader)
+
 with open(picturesCSV, 'rb') as csvFile:
     reader = csv.DictReader(csvFile)
     pictures = list(reader)
+    
+with open(goalsCSV, 'rb') as csvFile:
+    reader = csv.DictReader(csvFile)
+    rawGoals = list(reader)
 
 def isOnDelList(name):
     delList = ['mike.ligthart', 'hunter', 'elvira', 'viewer']
@@ -77,6 +89,8 @@ for rawActivity in rawActivities:
     activity['picture'] = findPicture(pictures, rawActivity['PICTURE_ID'])
     activity['carbohydrate_value'] = rawActivity['CARBOHYDRATE_VALUE']
     activity['#words'] = len(re.findall(r'\w+', rawActivity['DESCRIPTION']))
+    personal_dict = (act for act in personal_level if act["added"] == activity['added'].strftime("%Y-%m-%d %H:%M:%S")).next()
+    activity['personal'] = personal_dict['personal']
     activities.append(activity)
     activities = sorted(activities, key=itemgetter('added'))
 
@@ -84,3 +98,26 @@ with open('data/cleaned/activities.csv', 'wb') as outputFile:
     writer = csv.DictWriter(outputFile, activities[0].keys())
     writer.writeheader()
     writer.writerows(activities)
+   
+# Process goals
+    for rawGoal in rawGoals:
+        if isOnDelList(rawGoal['USER_USER_NAME']) == False:
+            goal = {}
+            goal['participant'] = changeNameForNumber(rawGoal['USER_USER_NAME'])
+            goal['added'] = datetime.strptime(rawGoal['ADDED'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+            goal['goal_type'] = rawGoal['GOAL_TYPE']
+            goal['target'] = rawGoal['TARGET']
+            goal['value'] = int(rawGoal['TARGET_VALUE'])
+            goal['met'] = rawGoal['MET'] == "TRUE"
+            goal['deadline'] = datetime.strptime(rawGoal['DEADLINE'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+            if(goal['met']):
+                goal['met_at'] = datetime.strptime(rawGoal['MET_AT_TIMESTAMP'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+            else:
+                goal['met_at'] = ''
+            goals.append(goal)
+            goals = sorted(goals, key=itemgetter('added'))
+            
+with open('data/cleaned/goals.csv', 'wb') as outputFile:
+    writer = csv.DictWriter(outputFile, goals[0].keys())
+    writer.writeheader()
+    writer.writerows(goals)           
