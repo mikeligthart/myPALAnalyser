@@ -1,5 +1,7 @@
 import numpy as np
+from numpy import inf
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
 
 addedContent = np.load('data/cleaned/timeline_analysis_added_content.npy')
@@ -21,23 +23,30 @@ colors = ["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#00
 "#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C"]
 area=np.ones([1, 14])*150
 area[0,6]=5
+colors2 = ['r', 'b', 'c', 'm', 'k', 'y']
 
-added_content_norm = np.linalg.norm(addedContent)
-consistency_norm = np.linalg.norm(consistency)/2
-consistency_x_shift = 0.1
+#added_content_norm = np.linalg.norm(addedContent)
+#consistency_norm = np.linalg.norm(consistency)/2
+#consistency_x_shift = 0.1
+#consistency_x_shift + (np.max(consistency) - consistency[index])/consistency_norm
+consistency = 1/consistency
+consistency[consistency == inf] = 0
+nr_of_clusters = 4
+X = np.column_stack((consistency, addedContent))
+X = np.delete(X, 6, 0)
+y_pred = KMeans(n_clusters=nr_of_clusters).fit_predict(X)
+y_pred = np.insert(y_pred, 6, nr_of_clusters)
 
 for index in range(0,nr_of_participants):
     label = 'p' + str(index+1)
-    scatter_plot = plt.scatter(consistency_x_shift + (np.max(consistency) - consistency[index])/consistency_norm, addedContent[index], s=area[0,index], c=colors[index], alpha=0.5, label=label)
+    scatter_plot = plt.scatter(consistency[index], addedContent[index], s=area[0,index], facecolors=colors[index], edgecolors=colors2[y_pred[index]], alpha=0.5, label=label)
 
 plt.ylim([0,80])
 plt.xlim([0, 1])
 lgd = plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.08))
 title = plt.title('Interaction Timeline Summary: Consistency vs. # Added Content', y=1.08)
-#plt.text(0.5, 1.01, 'Interaction Timeline Summary: Consistency vs. Added Content', ha='center', size=16)
 x_label = plt.xlabel('Consistency')
 y_label = plt.ylabel('# Added Content')
-#plt.text(-0.01, 0.5, 'Added Content', va='center', rotation='vertical')
 
 plt.grid()
 plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
