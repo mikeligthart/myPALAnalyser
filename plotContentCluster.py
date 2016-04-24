@@ -1,13 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Apr 23 16:17:20 2016
+
+@author: Mike
+"""
 import numpy as np
-from numpy import inf
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
 
+#Load data
+median = np.load('data/cleaned/content_median.npy')
+iqr = np.load('data/cleaned/content_iqr.npy')
+nr_of_participants = int(median.shape[0])
 
-addedContent = np.load('data/cleaned/timeline_analysis_added_content.npy')
-consistency = np.load('data/cleaned/timeline_analysis_consistency.npy')
-nr_of_participants = len(addedContent)
- 
+# Eastehics
 colors = ["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
 "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
 "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
@@ -25,32 +30,17 @@ area=np.ones([1, 14])*150
 area[0,6]=5
 colors2 = ['r', 'b', 'c', 'm', 'k', 'y']
 
-#added_content_norm = np.linalg.norm(addedContent)
-#consistency_norm = np.linalg.norm(consistency)/2
-#consistency_x_shift = 0.1
-#consistency_x_shift + (np.max(consistency) - consistency[index])/consistency_norm
-consistency = 1/consistency
-consistency[consistency == inf] = 0
-nr_of_clusters = 3
-X = np.column_stack((consistency, addedContent))
-X = np.delete(X, 6, 0)
-X = np.delete(X, 3, 0)
-y_pred = KMeans(n_clusters=nr_of_clusters).fit_predict(X)
-y_pred = np.insert(y_pred, 3, 0)
-y_pred = np.insert(y_pred, 6, nr_of_clusters)
-
-
 for index in range(0,nr_of_participants):
     label = 'p' + str(index+1)
-    scatter_plot = plt.scatter(consistency[index], addedContent[index], s=area[0,index], facecolors=colors[index], edgecolors=colors2[y_pred[index]], alpha=0.5, label=label)
+    scatter_plot = plt.scatter(iqr[index, 0], median[index, 0], s=area[0,index], facecolors=colors[index], alpha=0.5, label=label)
 
-plt.ylim([0,80])
-plt.xlim([0, 1])
+plt.ylim([0,35])
+plt.xlim([0, 25])
 lgd = plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.08))
-title = plt.title('Interaction Timeline Summary: Consistency vs. # Added Content', y=1.08)
-x_label = plt.xlabel('Consistency')
-y_label = plt.ylabel('# Added Content')
+title = plt.title('Content Login Time (Minutes) Summary', y=1.08)
+x_label = plt.xlabel('Interquartile range')
+y_label = plt.ylabel('Median')
 
 plt.grid()
-plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
+plt.savefig('data/cleaned/summary_plots/content_login_time_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
 plt.close()
