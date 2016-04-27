@@ -12,7 +12,7 @@ from matplotlib.font_manager import FontProperties
 
 # Settings
 debug = False
-save_as = 'png'
+save_as = 'both'
 number_of_days = 23
 
 # Load data
