@@ -2,6 +2,7 @@ import numpy as np
 from numpy import inf
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from sklearn.neighbors import KernelDensity
 
 
 addedContent = np.load('data/cleaned/timeline_analysis_added_content.npy')
@@ -34,9 +35,9 @@ consistency[consistency == inf] = 0
 nr_of_clusters = 3
 X = np.column_stack((consistency, addedContent))
 X = np.delete(X, 6, 0)
-X = np.delete(X, 3, 0)
+#X = np.delete(X, 3, 0)
 y_pred = KMeans(n_clusters=nr_of_clusters).fit_predict(X)
-y_pred = np.insert(y_pred, 3, 0)
+#y_pred = np.insert(y_pred, 3, 0)
 y_pred = np.insert(y_pred, 6, nr_of_clusters)
 
 
@@ -53,4 +54,21 @@ y_label = plt.ylabel('# Added Content')
 
 plt.grid()
 plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary.png', dpi=300, bbox_extra_artists=(lgd, title, x_label, y_label, ), bbox_inches='tight')
+plt.close()
+
+# Gaussian KDE
+X = addedContent * consistency
+X_calc = np.delete(X, 6, 0)[:, np.newaxis]
+X_plot = np.linspace(0, 40, 1000)[:, np.newaxis]
+kde = KernelDensity(kernel='gaussian', bandwidth=0.75).fit(X_calc)
+log_dens = kde.score_samples(X_plot)
+val = 0.004
+for index in range(0,nr_of_participants):
+    label = 'p' + str(index+1)
+    plt.plot(X[index], val, 'o', color=colors[index], label=label) 
+lgd = plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.08))
+
+plt.axhline(y=0.01, linewidth=1, color='r')
+plt.plot(X_plot[:, 0], np.exp(log_dens))
+plt.savefig('data/cleaned/summary_plots/interaction_profiles_summary_summary.png', dpi=300, bbox_extra_artists=(lgd, ), bbox_inches='tight')
 plt.close()
