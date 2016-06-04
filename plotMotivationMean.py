@@ -29,5 +29,14 @@ y = mean_motivation[0, :]
 yerr = [y - confidence_interval[0, :, 0], confidence_interval[0, :, 1] - y]
 
 plt.errorbar(x, y, yerr = yerr)
+plt.title('Mean motivation with 95% confidence intervals')
+
+plt.xlabel('Time')
 plt.xlim([0, 4])
-plt.show()
+plt.xticks(x, ['pre', 'half way', 'post'], size=8)
+
+plt.ylabel('Motivation score')
+plt.ylim([1, 6])
+
+plt.grid()
+plt.savefig('data/cleaned/summary_plots/mean_motivation_all.png', bbox_inches='tight', dpi=300)

@@ -35,9 +35,10 @@ consistency[consistency == inf] = 0
 nr_of_clusters = 3
 X = np.column_stack((consistency, addedContent))
 X = np.delete(X, 6, 0)
-#X = np.delete(X, 3, 0)
+X = np.delete(X, 3, 0)
 y_pred = KMeans(n_clusters=nr_of_clusters).fit_predict(X)
-#y_pred = np.insert(y_pred, 3, 0)
+
+y_pred = np.insert(y_pred, 3, 1)
 y_pred = np.insert(y_pred, 6, nr_of_clusters)
 
 

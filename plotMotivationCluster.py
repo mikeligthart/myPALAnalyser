@@ -39,7 +39,7 @@ plt.ylim([0,1])
 plt.xlim([6, 12])
 lgd = plt.legend(loc=0, scatterpoints = 1, bbox_to_anchor=(1.3, 1.08))
 title = plt.title('Motivation versus Consistency', y=1.08)
-x_label = plt.xlabel('AUD Motivation')
+x_label = plt.xlabel('AUC Motivation')
 y_label = plt.ylabel('Consistency')
 
 plt.grid()

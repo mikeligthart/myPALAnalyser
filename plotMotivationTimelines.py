@@ -30,19 +30,23 @@ plot_index = [[0, 0], [0, 1], [1, 0], [1, 1]]
 def get_subplot(axarr, header_index):
     if header_index == 0:
         subplot = axarr[0, 0]
-        subplot.set_title('General motivation', size=7)
+        subplot.set_title('General motivation', size=9)
+        subplot.set_ylabel('score', size=7)
         return subplot
     elif header_index == 1:
         subplot = axarr[0, 1]
-        subplot.set_title('Feeling of Autonomy', size=7)
+        subplot.set_title('Feeling of Autonomy', size=9)
+        subplot.set_ylabel('score', size=7)
         return subplot
     elif header_index == 2:
         subplot = axarr[1, 0]
-        subplot.set_title('Feeling of Competence', size=7)
+        subplot.set_title('Feeling of Competence', size=9)
+        subplot.set_ylabel('score', size=7)
         return subplot
     elif header_index == 3:
         subplot = axarr[1, 1]
-        subplot.set_title('Feeling of Reletedness', size=7)
+        subplot.set_title('Feeling of Reletedness', size=9)
+        subplot.set_ylabel('score', size=7)
         return subplot
     else:
         return None
