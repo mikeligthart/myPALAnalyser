@@ -36,7 +36,7 @@ plt.xlim([0, 4])
 plt.xticks(x, ['pre', 'half way', 'post'], size=8)
 
 plt.ylabel('Motivation score')
-plt.ylim([1, 6])
+plt.ylim([1, 7])
 
 plt.grid()
 plt.savefig('data/cleaned/summary_plots/mean_motivation_all.png', bbox_inches='tight', dpi=300)
